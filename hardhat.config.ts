@@ -3,12 +3,12 @@ require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
 
 const GOERLI_API_KEY = "7GrB6EItQJvBze51yHWBx0mHpM8jEY0w";
-const MUMBAI_API_KEY = "BulCaczA8_MGcz34wlxGZNPVslXQOgRi";
+const MUMBAI_API_KEY = "5fubKUPYlpNnkKdYUExvk7JiVXhXtbx-";
 const SEPOL_API_KEY = "Jt62jFDCQg9BOxFDkEthMgfaTw-0w3Wk";
 const MAINNET_API_KEY = "uhA_z0k72AG-CU81hfuwozXD_LIyzKQm";
 
 module.exports = {
-  solidity: "0.8.0",
+  solidity: "0.8.9",
 
   networks: {
     goerli:{
@@ -33,6 +33,6 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: "PD6SWDBT9XTRY81QW9E7VYN721KGBX3ZD5"
+    apiKey: "KC1MM7TEYMXATTFSJQ5TA4ARTYX8P5WU36"
   },
 };
