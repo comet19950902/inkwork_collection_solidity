@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/721/extensions/ERC721Storage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InkWNFT is ERC721URIStorage {
-    using Count for Counters.Counter;
+    using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
 
     string private baseURI;
@@ -30,9 +30,8 @@ contract InkWNFT is ERC721URIStorage {
             _tokenId.increment();
             uint tokenId = _tokenId.current();
 
-            _safeM(to[i], tokenId);
+            _safeMint(to[i], tokenId);
             _setTokenURI(tokenId, tokenURIs[i]);
-            _MetadataURI(tokenId, tokenURIs[i]);
 
             balances[to[i]].increment();
 
@@ -40,7 +39,7 @@ contract InkWNFT is ERC721URIStorage {
         }
     }
 
-    function approve(address, uint256 tokenId) public virtual override {
+    function approve(address to, uint256 tokenId) public virtual override {
         address owner = ownerOf(tokenId);
         require(to != owner, "ERC721: approval to current owner");
 
@@ -63,7 +62,7 @@ contract InkWNFT is ERC721URIStorage {
         balances[to].increment();
     }
 
-    function balanceOf(address account) public view returns (uint256) {
-        return balances[account].current;
+    function balanceOf(address account) public view override returns (uint256) {
+        return balances[account].current();
     }
 }

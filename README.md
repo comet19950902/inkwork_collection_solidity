@@ -2,4 +2,4 @@
 
 yarn hardhat compile
 yarn hardhat run ./scripts/deploy.ts --network sepol
-yarn hardhat verify 0x4d72C69F3d90739C8bC8dCbD353b74E378A67EBD InkWork_Collection IWC --network sepol
+yarn hardhat verify 0x3EE083934baD03d8eA32b264f7d633719A1433c3 InkWork_Collection IWC --network sepol
