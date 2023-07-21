@@ -1,65 +1,69 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/721/extensions/ERC721Storage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InkWNFT is ERC721URIStorage {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
-    
+    using Count for Counters.Counter;
+    Counters.Counter private _tokenId;
+
+    string private baseURI;
     address contractOwner;
-    bool gameStarted;
 
-    mapping( address => int256 ) profitPerWallet;
+    mapping(address => Counters.Counter) private balances;
 
-    event TankNFTMinted( address player, uint256 tokenId );
-    event BettingStarted( address player, uint256 amount );
-    event BettingEnded( address winner, uint256 rewardAmount );
+    event InkWorkNFTMinted(address player, uint256 tokenId);
 
     constructor(
         string memory _name,
         string memory _symbol
-    ) ERC721( _name, _symbol ) {
+    ) ERC721(_name, _symbol) {
         contractOwner = msg.sender;
     }
 
-    function mintTankNFT ( string memory _tokenUri ) public returns ( uint256 _tokenId ) {
-        _tokenIds.increment(  );
+    function mintInkWorkNFT(address[] memory to, string[] memory tokenURIs) external {
+        require(to.length == tokenURIs.length, "Input arrays length mismatch");
 
-        uint256 tokenId = _tokenIds.current(  );
+        for (uint256 i = 0; i < tokenURIs.length; i++) {
+            _tokenId.increment();
+            uint tokenId = _tokenId.current();
 
-        _safeMint( msg.sender, tokenId );
-        _setTokenURI( tokenId, _tokenUri );
+            _safeM(to[i], tokenId);
+            _setTokenURI(tokenId, tokenURIs[i]);
+            _MetadataURI(tokenId, tokenURIs[i]);
 
-        emit TankNFTMinted( msg.sender, tokenId );
-        return tokenId;
+            balances[to[i]].increment();
+
+            emit InkWorkNFTMinted(to[i], tokenId);
+        }
     }
 
-    function bettingEther ( uint256 _amount ) public payable returns ( bool status ) {
-        require( msg.value >= _amount, "The payment is not enough!" );
-        require( gameStarted == false, "The game is already started!" );
-        
-        profitPerWallet[ msg.sender ] -= int256( _amount );
-        gameStarted = true;
+    function approve(address, uint256 tokenId) public virtual override {
+        address owner = ownerOf(tokenId);
+        require(to != owner, "ERC721: approval to current owner");
 
-        emit BettingStarted( msg.sender, _amount );
-        return true;
+        require(
+            msg.sender == owner || isApprovedForAll(owner, msg.sender),
+            "ERC721: approve caller is not owner nor approved for all"
+        );
+
+        _approve(to, tokenId);
     }
 
-    function sendRewardToWinner ( address _winner, uint256 _rewardAmount ) public returns ( bool status ) {
-        require( address( this ).balance >= _rewardAmount, "The balance is not enough!" );
-        require( gameStarted == true, "The game is not started yet!" );
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        _transfer(from, to, tokenId);
 
-        ( bool sent, ) = _winner.call{ value: _rewardAmount }( "" );
-        
-        require( sent, "Failed to send Ether" );
+        balances[from].decrement();
+        balances[to].increment();
+    }
 
-        profitPerWallet[ _winner ] += int256( _rewardAmount );
-        gameStarted = false;
-        
-        emit BettingEnded( _winner, _rewardAmount );
-        return true;
+    function balanceOf(address account) public view returns (uint256) {
+        return balances[account].current;
     }
 }
